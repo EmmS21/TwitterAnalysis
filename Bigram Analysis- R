@@ -1,0 +1,40 @@
+
+install.packages("textcat")
+library(tm)
+library(textcat)
+
+the_data <- read.csv("twitter_data.csv")
+tweets_data <- the_data$x
+tweets_corpus <- Corpus(VectorSource(tweets_data))
+subSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
+twitterHandleRemover <- function(x) gsub("@\\S+","", x)
+shortWordRemover <- function(x) gsub('\\b\\w{1,5}\\b','',x)
+urlRemover <- function(x) gsub("http:[[:alnum:]]*","", x)
+hashtagRemover <- function(x) gsub("#\\S+","", x)
+tweets_corpus <- tm_map(tweets_corpus, subSpace, "/")
+tweets_corpus <- tm_map(tweets_corpus, removePunctuation)
+tweets_corpus <- tm_map(tweets_corpus, subSpace, "@")
+tweets_corpus <- tm_map(tweets_corpus, subSpace, "\\|%&*#+_><")
+tweets_corpus <- tm_map(tweets_corpus, content_transformer(tolower))
+tweets_corpus <- tm_map(tweets_corpus, removeNumbers)
+tweets_corpus <- tm_map(tweets_corpus, removeWords, c(stopwords("english"),"people","follow","retweet","everyone","please","someone","beyonc","retweets","twitter","couldn","country","friends","something","better","morning","things","really","believe","looking","though", "automatically", "unfollow","instantly","police","station","jifyptxuh","followed","unfollowed","contact","details","guaranteed","active","followers","prosper","together"))
+tweets_corpus <- tm_map(tweets_corpus, content_transformer(urlRemover))
+tweets_corpus <- tm_map(tweets_corpus, content_transformer(shortWordRemover))
+tweets_corpus <- tm_map(tweets_corpus, content_transformer(twitterHandleRemover))
+tweets_corpus <- tm_map(tweets_corpus, content_transformer(hashtagRemover))
+
+tweets_corp<- corpus(tweets_corpus)
+tweets_dfm <- tokens(tweets_corp, remove_numbers = T, remove_hyphens = T) %>%
+  tokens_remove("\\p{P}", valuetype ="regex", padding=TRUE)%>%
+  tokens_remove("\\d+", padding = TRUE)%>%
+  tokens_ngrams(n=2) %>%
+  dfm()
+
+#top 50 chart
+tweets_dfm %>%
+  textstat_frequency(n=50)%>%
+  ggplot(aes(x=reorder(feature, frequency), y=frequency))+
+  geom_point()+
+  coord_flip()+
+  labs(x = NULL, y = "Frequency")+
+  theme_minimal()
