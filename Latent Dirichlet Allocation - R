@@ -1,0 +1,54 @@
+
+    install.packages("data.table")
+    library("data.table")
+    this<-fread("twitter_targeted_list2.csv", sep=",")
+    
+    #non-insightful words
+    
+    words_to_filter <- c("tco","first","gmailcom","one","ufffufe","ufb", "ufc", "old", "without", "follow", "back", "make","great")
+    
+    #convert to corpus and clean up
+    
+    cleaned <- VCorpus(VectorSource(this$V6))
+    subSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
+    cleaned <- tm_map(cleaned, subSpace, "/")
+    cleaned <- tm_map(cleaned, subSpace, "@")
+    cleaned <- tm_map(cleaned, subSpace, "\\|%&*#")
+    cleaned <- tm_map(cleaned, content_transformer(tolower))
+    cleaned <- tm_map(cleaned, removeNumbers)
+    cleaned <- tm_map(cleaned, removeWords, stopwords("en"))
+    cleaned <- tm_map(cleaned, removePunctuation)
+    cleaned <- tm_map(cleaned, removeWords,words_to_filter)
+    
+    #tokenizing corpus and removing words that do not appear in english dictionary
+    
+    docu<- corpus(cleaned)
+    my_tokens <- tokens(docu, remove_punct = F, remove_numbers = F, remove_url = T)
+    docu_clean <- tokens_select(my_tokens, names(data_int_syllables))
+    
+    #token to dfm to Corpus to DTM
+    
+    dfm_obj <- dfm(docu_clean, tolower= TRUE, stem= FALSE, select=NULL, remove=NULL, dictionary= NULL, thesaurus = NULL)
+    docu_frame <- convert(dfm_obj, to="data.frame")
+    docu_corp <- Corpus(VectorSource(docu_frame))
+    docu_dtm <- DocumentTermMatrix(cleaned)
+    rowTotals <- apply(docu_dtm, 1, sum)
+    dtm.new <- docu_dtm[rowTotals >0, ]
+    
+    #topic modeling through the Latent Dirichlet Allocation model
+    
+    ap_lda <- LDA(dtm.new, k=7, control = list(seed = 1234))
+    ap_topics <- tidy(ap_lda, matrix = "beta")
+    
+    ap_top_terms <- ap_topics %>%
+      group_by(topic) %>%
+      top_n(7,beta) %>%
+      ungroup() %>%
+      arrange(topic, -beta)
+    
+    ap_top_terms %>%
+      mutate(term=reorder(term, beta)) %>%
+      ggplot(aes(term,beta, fill=factor(topic))) +
+      geom_col(show.legend = FALSE) +
+      facet_wrap(~ topic, scales = "free") +
+      coord_flip()
