@@ -1,4 +1,4 @@
-# TwitterAnalysis
+# Twitter Analysis
 Analysing Twitter data to identify interesting trends for Hooros clients
 
 
@@ -17,11 +17,10 @@ One contentious issue in this analysis was choosing the 'appropriate' number of 
 
 
 
-#Bigram Analysis
+Bigram Analysis
 
 In order to get an understanding of the types of conversation the users we identified are having, which would then presumably give us a better understanding of their interests, things they talk about and themes we can exploit to increase the efficiency of marketing campaigns targeting this audience, we opted to carry out a bigram analysis identifying the top 50 occuring bigrams (in terms of frequency) and using this to better understand the conversations people were having. This analysis was based on over 500 000 tweets observed over a period of a few days (I understand that this could mean the topics identified are simply topics trending at that particular moment and may not give us the ability to accurately infer themes of topics that these users normally have- e.g by evaluating tweets over a longer period, say a few months would, you may be able to get a clearer picture of the types of topics these users are interested in).
 
 Bigrams can be loosely considered two adjacent words from a given text.  Bigrams give a more contextual understanding of the types of topics or conversations people are having. In this scenario we are using bigrams to understand the types of conversations the people we are targeting are having.
 
 - More reading on ngram analysis https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3694275/ 
-*******/
