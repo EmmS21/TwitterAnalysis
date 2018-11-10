@@ -14,6 +14,9 @@ We chose the Latent Dirichlet Allocation (LDA) model primarily because we though
 
 One contentious issue in this analysis was choosing the 'appropriate' number of topics. There appears to be numerous views on the best method to find the ideal number of topics including the 'ldatuning' package and the heuristic appproach (which I confess to not understanding). To choose the 'right' number of topics, I ran numerous trials and settled on between 7 and 8 topics. This made the topics more readable and easier to interpret for the purposes outlined
 ***********/
+
+
+
 /*************
 #Bigram Analysis
 
