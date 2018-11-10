@@ -1,0 +1,22 @@
+install.packages("data.table")
+library("data.table")
+library(rtweet)
+
+this<-fread("twitter_targeted_list2.csv", sep=",")
+
+#we are specifically reading unique User ID's
+userIds <- as.vector(unique(this$V3))
+time_lines <- vector("list", length(UserIds))
+
+#factoring in Twitter API rate limit
+for (i in seq_along(time_lines)){
+  time_lines[[i]] <- get_timeline(userIds[i], n =500)
+  if(i%%52L==0L){
+    reset_l <- rate_limit("get_timeline")
+    Sys.sleep(as.numeric(reset_l$reset, "secs"))
+  }
+  #cat(i,"") - this is optional and just shows us an update of which user we are reading frmo
+}
+
+time_lines <- do_call_rbind(time_lines)
+write.csv("twitter_data.csv", row.names= FALSE)
