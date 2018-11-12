@@ -10,20 +10,14 @@
     #convert to corpus and clean up
     
     cleaned <- VCorpus(VectorSource(this$V6))
-    subSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
-    cleaned <- tm_map(cleaned, subSpace, "/")
-    cleaned <- tm_map(cleaned, subSpace, "@")
-    cleaned <- tm_map(cleaned, subSpace, "\\|%&*#")
     cleaned <- tm_map(cleaned, content_transformer(tolower))
-    cleaned <- tm_map(cleaned, removeNumbers)
     cleaned <- tm_map(cleaned, removeWords, stopwords("en"))
-    cleaned <- tm_map(cleaned, removePunctuation)
     cleaned <- tm_map(cleaned, removeWords,words_to_filter)
     
     #tokenizing corpus and removing words that do not appear in english dictionary
-    
+    tokens(x, remove_punct = TRUE, remove_symbols = TRUE)
     docu<- corpus(cleaned)
-    my_tokens <- tokens(docu, remove_punct = F, remove_numbers = F, remove_url = T)
+    my_tokens <- tokens(docu, remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = T)
     docu_clean <- tokens_select(my_tokens, names(data_int_syllables))
     
     #token to dfm to Corpus to DTM
