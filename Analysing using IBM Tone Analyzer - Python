@@ -33,8 +33,7 @@ def clean_text(df, text_field):
   df[text_field] = df[text_field].str.replace('[\U0001F1E0-\U0001F1FF]', "") #flag remover
   df[text_field] = df[text_field].str.replace(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', "") #url remover
   df[text_field] = df[text_field].str.replace("  ","")
-  df[text_field] = df[text_field].str.replace("[\-_!~*'()]","")
-  df[text_field] = df[text_field].str.replace(",","")
+  df[text_field] = df[text_field].str.replace("[\-_~*'()]","")
   df[text_field] = df[text_field].str.replace("--","")
   return df[text_field]
 
